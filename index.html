@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multi-Format Content Repurposer | 3Sci Open Source Work Hack #3</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090f17;
+      --card-bg: #111a26;
+      --card-border: #1e2c3d;
+      --accent: #00d2b4;
+      --accent-dim: rgba(0, 210, 180, 0.12);
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --btn-hover: #02bda2;
+      --li-color: #38bdf8;
+      --tw-color: #60a5fa;
+      --em-color: #a78bfa;
+      --dp-color: #f59e0b;
+      --vs-color: #34d399;
+      --rd-color: #ff4500;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding: 30px 40px; min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--card-border);
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+    }
+    .brand-group { display: flex; align-items: center; gap: 16px; }
+    .brand-logo { height: 46px; width: auto; object-fit: contain; }
+    .brand-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.5px;
+    }
+    .badge {
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .main-layout {
+      display: grid;
+      grid-template-columns: 440px 1fr;
+      gap: 24px;
+      flex-grow: 1;
+    }
+
+    /* Left Input Panel */
+    .input-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .section-title {
+      font-size: 15px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--accent);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .input-group label {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    input[type="text"], textarea, select {
+      width: 100%;
+      background: #090f17;
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 13.5px;
+      padding: 10px 12px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input[type="text"]:focus, textarea:focus, select:focus {
+      border-color: var(--accent);
+    }
+    textarea {
+      resize: vertical;
+      min-height: 250px;
+      line-height: 1.5;
+      font-family: inherit;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #090f17;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      flex: 1;
+      transition: background 0.2s;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-primary:hover { background: var(--btn-hover); }
+    .btn-secondary {
+      background: #1c2b3d;
+      color: #cbd5e1;
+      border: 1px solid #2d3f55;
+      padding: 12px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-secondary:hover { background: #26384e; color: #fff; }
+
+    /* Right Output Grid (Responsive 2-to-3 column grid) */
+    .output-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 18px;
+      align-content: start;
+    }
+    .output-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 310px;
+    }
+    .output-card.linkedin { border-top: 3px solid var(--li-color); }
+    .output-card.twitter { border-top: 3px solid var(--tw-color); }
+    .output-card.newsletter { border-top: 3px solid var(--em-color); }
+    .output-card.discussion { border-top: 3px solid var(--dp-color); }
+    .output-card.video { border-top: 3px solid var(--vs-color); }
+    .output-card.reddit { border-top: 3px solid var(--rd-color); }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .format-tag {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .format-tag.li { color: var(--li-color); }
+    .format-tag.tw { color: var(--tw-color); }
+    .format-tag.em { color: var(--em-color); }
+    .format-tag.dp { color: var(--dp-color); }
+    .format-tag.vs { color: var(--vs-color); }
+    .format-tag.rd { color: var(--rd-color); }
+
+    .btn-copy {
+      background: #1c2b3d;
+      color: #cbd5e1;
+      border: 1px solid #2d3f55;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-copy:hover {
+      background: var(--accent);
+      color: #090f17;
+      border-color: var(--accent);
+    }
+
+    .output-content {
+      background: #090f17;
+      border: 1px solid #1a2737;
+      border-radius: 6px;
+      padding: 12px 14px;
+      font-size: 12.5px;
+      line-height: 1.55;
+      color: #cbd5e1;
+      white-space: pre-wrap;
+      overflow-y: auto;
+      height: 220px;
+    }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--card-border);
+      margin-top: 28px;
+      padding-top: 14px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .footer-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .footer-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand-group">
+      <img src="templates/logo_white.png" class="brand-logo" alt="3Sci Logo" onerror="this.src='logo_white.png'; this.onerror=null;">
+      <div>
+        <div class="brand-title">3SCI CONTENT REPURPOSER</div>
+        <div style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">Convert 1 Blog or Transcript into 6 Targeted Distribution Formats</div>
+      </div>
+    </div>
+    <div class="badge">Open Source Hack #3</div>
+  </header>
+
+  <div class="main-layout">
+    <!-- Input Column -->
+    <div class="input-panel">
+      <div class="section-title">
+        <span>Raw Content Input</span>
+        <span style="font-size: 11px; color: var(--text-muted);">100% Private & Local</span>
+      </div>
+
+      <div class="input-group">
+        <label>Primary Topic / Headline</label>
+        <input type="text" id="input-headline" placeholder="e.g., Why Local-First AI Tools Beat Monthly SaaS Subscriptions">
+      </div>
+
+      <div class="input-group">
+        <label>Audience / Target Tone</label>
+        <select id="input-tone">
+          <option value="conversational">Conversational, Friendly & Practical</option>
+          <option value="executive">Executive, Strategic & Data-Backed</option>
+          <option value="contrarian">Thought-Provoking & Contrarian</option>
+        </select>
+      </div>
+
+      <div class="input-group" style="flex-grow: 1; display: flex; flex-direction: column;">
+        <label>Paste Raw Article, Newsletter, or Transcript</label>
+        <textarea id="input-content" placeholder="Paste your article draft, transcript, or rough bulleted ideas here..."></textarea>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-primary" onclick="repurposeContent()">⚡ Repurpose Into 6 Formats</button>
+        <button class="btn-secondary" onclick="loadSample()">Load Sample</button>
+      </div>
+    </div>
+
+    <!-- Output Formats Grid -->
+    <div class="output-grid">
+      
+      <!-- 1. LinkedIn Post -->
+      <div class="output-card linkedin">
+        <div class="card-header">
+          <span class="format-tag li">1. LinkedIn Post (Story & Hook)</span>
+          <button class="btn-copy" onclick="copyCard('out-linkedin', this)">Copy Post</button>
+        </div>
+        <div class="output-content" id="out-linkedin">Hit "Repurpose Into 6 Formats" or "Load Sample" to generate your LinkedIn post.</div>
+      </div>
+
+      <!-- 2. X / Twitter Thread -->
+      <div class="output-card twitter">
+        <div class="card-header">
+          <span class="format-tag tw">2. Structured X/Twitter Thread</span>
+          <button class="btn-copy" onclick="copyCard('out-twitter', this)">Copy Thread</button>
+        </div>
+        <div class="output-content" id="out-twitter">Hit "Repurpose Into 6 Formats" or "Load Sample" to generate your 5-part thread.</div>
+      </div>
+
+      <!-- 3. Email Newsletter Blurb -->
+      <div class="output-card newsletter">
+        <div class="card-header">
+          <span class="format-tag em">3. Email Newsletter Blurb (3 Bullets)</span>
+          <button class="btn-copy" onclick="copyCard('out-newsletter', this)">Copy Blurb</button>
+        </div>
+        <div class="output-content" id="out-newsletter">Hit "Repurpose Into 6 Formats" or "Load Sample" to generate your 3-bullet blurb.</div>
+      </div>
+
+      <!-- 4. Community Discussion Prompt -->
+      <div class="output-card discussion">
+        <div class="card-header">
+          <span class="format-tag dp">4. Community Discussion Prompt</span>
+          <button class="btn-copy" onclick="copyCard('out-discussion', this)">Copy Prompt</button>
+        </div>
+        <div class="output-content" id="out-discussion">Hit "Repurpose Into 6 Formats" or "Load Sample" to generate your discussion debate.</div>
+      </div>
+
+      <!-- 5. 60-Second Video Script (Shorts / Reels / TikTok) -->
+      <div class="output-card video">
+        <div class="card-header">
+          <span class="format-tag vs">5. 60-Second Short Video Script</span>
+          <button class="btn-copy" onclick="copyCard('out-video', this)">Copy Script</button>
+        </div>
+        <div class="output-content" id="out-video">Hit "Repurpose Into 6 Formats" or "Load Sample" to generate your short-form video script.</div>
+      </div>
+
+      <!-- 6. Reddit Post (Discussion & Lessons Learned) -->
+      <div class="output-card reddit">
+        <div class="card-header">
+          <span class="format-tag rd">6. Reddit Post (r/Productivity / r/SaaS)</span>
+          <button class="btn-copy" onclick="copyCard('out-reddit', this)">Copy Reddit Post</button>
+        </div>
+        <div class="output-content" id="out-reddit">Hit "Repurpose Into 6 Formats" or "Load Sample" to generate your Reddit breakdown.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer>
+    <div>
+      <a href="https://3sci.com" target="_blank" rel="noopener noreferrer" class="footer-link">3sci.com</a>
+      <span style="margin-left: 8px;">• Open Source Tools for Founders & Creators</span>
+    </div>
+    <span>100% Client-Side • Zero Telemetry • No API Keys Required</span>
+  </footer>
+
+  <script>
+    function copyCard(elementId, btn) {
+      const text = document.getElementById(elementId).innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        const originalText = btn.innerText;
+        btn.innerText = "Copied! ✓";
+        btn.style.background = "#00d2b4";
+        btn.style.color = "#090f17";
+        setTimeout(() => {
+          btn.innerText = originalText;
+          btn.style.background = "";
+          btn.style.color = "";
+        }, 1800);
+      });
+    }
+
+    function loadSample() {
+      document.getElementById('input-headline').value = "Why Local Automation Hacks Beat Expensive Monthly SaaS Subscriptions";
+      document.getElementById('input-content').value = `Most small businesses and creators fall into the 'SaaS Trap': every time they need to automate a simple task—like batch-generating graphics, testing financial models, or formatting content—they sign up for another $29 to $99/month tool.
+
+Within a year, they are spending hundreds of dollars a month on software they only half-use, and worse: their data is locked in someone else's walled garden.
+
+Instead of paying recurring fees, you can build lightweight, local-first tools using basic open-source code (Node.js, Puppeteer, clean HTML/CSS). 
+
+These local work hacks offer three immediate advantages:
+1. True zero-cost operations—once built, running 1 or 1,000 tasks costs nothing.
+2. Complete data privacy—your customer numbers and proprietary notes never leave your hard drive.
+3. Total customization—you are not waiting on a product manager to build the features you need; you can tweak the code in 5 minutes with help from AI.
+
+Building in public and open-sourcing these hacks proves that founders don't need huge engineering budgets to work smarter.`;
+      repurposeContent();
+    }
+
+    function repurposeContent() {
+      const headline = document.getElementById('input-headline').value.trim() || "The Smart Approach to Local Automation";
+      const rawText = document.getElementById('input-content').value.trim();
+
+      if (!rawText) {
+        alert("Please paste some text or click 'Load Sample' first!");
+        return;
+      }
+
+      // Extract key sentences and paragraphs
+      const paragraphs = rawText.split(/\n+/).map(p => p.trim()).filter(p => p.length > 20);
+      const sentences = rawText.match(/[^.!?]+[.!?]+/g) || [rawText];
+      const cleanedSentences = sentences.map(s => s.trim()).filter(s => s.length > 15);
+
+      const p1 = paragraphs[0] || cleanedSentences[0] || headline;
+      const p2 = paragraphs[1] || cleanedSentences[1] || "The most effective tools remove friction quietly in the background.";
+      const bullet1 = cleanedSentences[2] || "Zero ongoing software fees or recurring cloud costs.";
+      const bullet2 = cleanedSentences[3] || "100% data privacy—your inputs never touch external servers.";
+      const bullet3 = cleanedSentences[4] || "Complete freedom to adjust and customize as your workflow scales.";
+
+      // 1. LinkedIn Post
+      const linkedinPost = 
+`${headline} 💡
+
+${p1}
+
+Here is what happens when you step off the subscription treadmill:
+
+👉 ${bullet1}
+👉 ${bullet2}
+👉 ${bullet3}
+
+${p2}
+
+The debate: Are you still defaulting to new monthly software subscriptions for simple tasks, or are you starting to build lightweight, local tools you actually own?
+
+Where do you draw the line between convenience and tool fatigue? 
+
+Drop your thoughts below—would love to hear your approach! 👇
+
+#WorkflowAutomation #Productivity #OpenSource #TechInnovation #3Sci`;
+
+      // 2. Twitter / X Thread
+      const twitterThread = 
+`1/5 Most people think scaling requires a dozen paid subscriptions. Here is why lightweight local tools win: 🧵👇
+
+2/5 The problem: ${p1}
+
+3/5 Here is the core unlock:
+• ${bullet1}
+• ${bullet2}
+• ${bullet3}
+
+4/5 The long-term advantage: ${p2}
+
+5/5 If you want to own your tools and eliminate recurring subscription fees, open-source local hacks are the way forward. 
+
+What repetitive task in your daily work is eating up the most time right now?`;
+
+      // 3. Email Newsletter Blurb
+      const newsletterBlurb = 
+`SUBJECT: Quick Take: ${headline}
+
+Hey everyone,
+
+${p1}
+
+If you are looking to simplify your stack this week, here are the 3 big takeaways:
+
+• Point 1: ${bullet1}
+• Point 2: ${bullet2}
+• Point 3: ${bullet3}
+
+Bottom line: ${p2}
+
+Got a question or an idea for our next open-source tool? Hit reply and let us know!
+
+— The 3Sci Team (3sci.com)`;
+
+      // 4. Community Discussion Prompt
+      const discussionPrompt = 
+`COMMUNITY DEBATE: ${headline} 💬
+
+Context: ${p1}
+
+Two contrasting views are emerging on this:
+
+View A: "Paying a small SaaS fee is always worth it because someone else maintains the server and software updates."
+View B: "Monthly tools create bloat and lock-in. Lightweight local tools give you total ownership, better privacy, and zero fees."
+
+Which camp do you fall into? How do you decide when to pay vs. when to build your own lightweight solution?`;
+
+      // 5. 60-Second Short Video Script
+      const videoScript = 
+`🎬 60-SECOND SHORT-FORM VIDEO SCRIPT
+TOPIC: ${headline}
+
+[0:00 - 0:05] HOOK
+👀 VISUAL: Fast cut to camera, pointer finger up. Bold on-screen text: "${headline.toUpperCase()}"
+🗣️ SPOKEN: "Stop paying $50 a month for software when you can run this on your own machine in 30 seconds."
+
+[0:05 - 0:20] THE PROBLEM
+👀 VISUAL: Show desktop screen / head shake. On-screen text: "The Software Subscription Trap"
+🗣️ SPOKEN: "${p1.slice(0, 140)}..."
+
+[0:20 - 0:45] THE 3 CORE TAKEAWAYS
+👀 VISUAL: Fast transitions / counting on fingers with animated text pop-ups:
+🗣️ SPOKEN:
+• "First: ${bullet1.slice(0, 80)}."
+• "Second: ${bullet2.slice(0, 80)}."
+• "Third: ${bullet3.slice(0, 80)}."
+
+[0:45 - 0:60] THE WRAP & CALL TO ACTION
+👀 VISUAL: Direct to lens, warm gesture.
+🗣️ SPOKEN: "${p2.slice(0, 100)}... I made the entire code 100% open source. Drop a comment below if you want the link, or let me know: are you team SaaS or team build-your-own?"`;
+
+      // 6. Reddit Post (Formatted for r/productivity, r/SaaS, r/SideProject)
+      const redditPost = 
+`TITLE: I got tired of the monthly SaaS treadmill, so I started building lightweight local-first tools instead [Breakdown]
+
+SUBREDDIT SUGGESTIONS: r/productivity, r/SideProject, r/SaaS, r/selfhosted
+
+Over the last few months, I noticed a frustrating pattern across my workflow: every time I needed to solve a basic operational bottleneck, the default answer was always "just pay $30-$80/month for another web app."
+
+${p1}
+
+After realizing how much friction and lock-in that created, I started replacing those tools with simple, local-first open source scripts (using basic Node.js, Puppeteer, and clean HTML). 
+
+Here are the 3 biggest takeaways I've noticed from moving away from recurring cloud tools:
+
+1. Cost predictability: ${bullet1}
+2. Complete privacy: ${bullet2}
+3. Control over the product: ${bullet3}
+
+${p2}
+
+Curious how others here approach this balance: At what point do you decide a problem is worth a recurring monthly subscription versus spending an hour building a local tool you own forever? 
+
+TL;DR: Stop defaulting to monthly subscriptions for simple workflow tasks. Lightweight, local-first scripts offer better privacy, zero fees, and total ownership.`;
+
+      document.getElementById('out-linkedin').innerText = linkedinPost;
+      document.getElementById('out-twitter').innerText = twitterThread;
+      document.getElementById('out-newsletter').innerText = newsletterBlurb;
+      document.getElementById('out-discussion').innerText = discussionPrompt;
+      document.getElementById('out-video').innerText = videoScript;
+      document.getElementById('out-reddit').innerText = redditPost;
+    }
+  </script>
+</body>
+</html>

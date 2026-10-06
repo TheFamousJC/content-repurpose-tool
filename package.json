@@ -1,0 +1,11 @@
+{
+  "name": "the-multi-format-content-repurpose-tool",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build:manual": "node build_manual_pdf.js"
+  },
+  "dependencies": {
+    "puppeteer": "^24.43.1"
+  }
+}
